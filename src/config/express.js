@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
 })
 app.use('/OnlineText', index)
 
-app.use(express.static(path.join('C:/OnlineText/', 'public')));
+app.use(express.static(path.join('D:/Front-endEngineerLearning/OnlineText/', 'public')));
 
 app.use(function (req, res) {
     res.status(404).render('404page')

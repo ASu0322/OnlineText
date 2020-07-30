@@ -1,83 +1,54 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <style type="text/css">
-        body {
-            background-color: black;
-        }
-
-        .talk_con {
-            width: 650px;
-            height: 500px;
-            border: 1px solid #666;
-            margin-left: auto;
-            margin-right: auto;
-            background: #f9f9f9;
-        }
-
-        .talk_show {
-            display: none;
-            width: 580px;
-            height: 420px;
-            border: 1px solid #666;
-            background: #fff;
-            margin: 10px auto 0;
-            overflow: auto;
-        }
-
-        .talk_input {
-            width: 580px;
-            margin: 10px auto 0;
-        }
-
-        .talk_word {
-            width: 420px;
-            height: 26px;
-            padding: 0px;
-            float: left;
-            margin-left: 10px;
-            outline: none;
-            text-indent: 10px;
-        }
-
-        .talk_sub {
-            width: 56px;
-            height: 30px;
-            float: left;
-            margin-left: 10px;
-        }
-
-        .talk {
-            margin: 5px
-        }
-
-        .talk span {
-            display: inline-block;
-            background: #4a3a92;
-            border-radius: 0px;
-            color: rgb(255, 255, 255);
-            padding: 1px;
-        }
-
-        .active {
-            background-color: red;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天畫面</title>
+    <link href="/images/Main.css" rel=stylesheet>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
 </head>
-
 <body>
-    <div class="talk_con" id="talk_con_id">
-        <form class="talk_form_id">
-            <div class="talk_input">
-                <input type="text" class="talk_word" id="talkwords">
-                <input type="reset" value="傳送" class="talk_sub" id="talksub">
+    <div class="menu" id="menu">
+        <div class="GroupSelect" id="GroupSelect">
+            <div id="MainIcon">
+                <div class="MainIconBackGround" id="MainIconBackGround"></div>
+                <div class="StraightLine" id="StraightLine"></div>
+                <div class="MainIcon" id="MainIcon" onclick="javascript:window.location.reload()">
+                    <div class="DialogBoxContent" id="DialogBoxContent">首頁</div>
+                </div>
             </div>
-        </form>
+            <div id="GroupButton"></div>
+            <div id="CreateGroupButton">
+                <div class="CreateGroupIconBackGround" id="CreateGroupIconBackGround"></div>
+                <div class="StraightLineForCreateGroup" id="StraightLineForCreateGroup"></div>
+                <div class="CreateGroupIcon" id="CreateGroupIcon">
+                    <div class="DialogBoxContentForCreateGroup" id="DialogBoxContentForCreateGroup">新增群組</div>
+                </div>
+            </div>
+        </div>
+        <div class="MessageChannel"></div>
+    </div>
+    <div class="content">
+        <div class="Banner">
+            <input type="button" value="好友" class="Friend" id="Friend">
+            <input type="button" value="新增好友" class="CreateFriend" id="CreateFriend">
+            <div class="FriendIcon"></div>
+        </div>
+        <div class="ChatScreen" id="ChatScreen">
+            <input type="text"  value="請輸入訊息..." class="InputText" id="TalkWord" onfocus="this.value=''">
+            <input type="button" value="" class="TalkSub" id="TalkSub">
+            <div class="CreateFriendPage" id="CreateFriendPage">
+                <h4>新增好友</h4>
+                <h5>&nbsp;&nbsp;&nbsp;&nbsp;您可以在這裡透過輸入好友信箱加入好友列表！</h5>
+                <input type="text" value="請輸入好友信箱" class="InputTextCreateFriend" id="InputTextCreateFriend" onfocus="this.value=''">
+                <input type="button" value="傳送好友邀請" class="SubInviteFriend" id="SubInviteFriend">
+                <div class="HorizontalLine"></div>
+            </div>
+        </div>
     </div>
 </body>
 <script type='text/javascript'>
-
+//Group Message Create Basic Function
     var userAccount
     var webSocketList = {}
 
@@ -97,7 +68,7 @@
 
         var onLoadMessage = JSON.parse(xhr_room.responseText)
         console.log(onLoadMessage)
-        creadRoom(onLoadMessage.data)
+        createRoom(onLoadMessage.data)
 
     };
 
@@ -143,22 +114,18 @@
 
     };
 
-
-
-
-
     function newMessage(message) {
-        var talk_show_fun = document.getElementsByClassName("talk_show");
-        var button_fun = document.getElementsByTagName("button");
+        var DialogBoxContentForGroup_tab = document.getElementsByClassName("DialogBoxContentForGroup");
+        var Talk_tab = document.getElementsByClassName("Talk");
         console.log(message)
-        for (x = 0; x < talk_show_fun.length; x++) {
-            if (button_fun[x].innerHTML == message.roomName) {
-                talk_show_fun[x].innerHTML = talk_show_fun[x].innerHTML +
-                    '<div class="talk"><span>' +
+        for (x = 0; x < Talk_tab.length; x++) {
+            if (DialogBoxContentForGroup_tab[x].innerHTML == message.roomName) {
+                Talk_tab[x].innerHTML = Talk_tab[x].innerHTML +
+                    '<span>' +
                     message.fromUserAccount +
                     ': ' +
                     message.message +
-                    '</span></div>';
+                    '<br></span>';
             }
         }
     }
@@ -169,102 +136,163 @@
     }
 
 
-    function creadRoom(roomMessage) {
-        var talk_getID, talk_createHTML, talk_span_getID, talk_span_createHTML;
-        var groupNum, q, r, button = [];
-        var talk_show_getID, talk_show_createHTML, Form;
+    function createRoom(roomMessage) {
+//Group Select Button
+        var GroupButton,r,GroupSelectGetID,GroupButtonID,GroupButtonGetID;
+        var MainIconForGroup,MainIconForGroupGetID,DialogBoxContentForGroup,StraightLine;
+        var Red,Orange,Yellow,Green,LightBlue,NavyBlue,Purple,RainbowColor=[];
+//Get Random for RainbowColor
+        function getRandom(min,max){
+            return Math.floor(Math.random()*(max-min+1))+min;
+        };
 
-        groupNum = roomMessage.length;
+        Red = "red"
+        Orange = "orange"
+        Yellow = "yellow"
+        Green = "green"
+        LightBlue = "#00FFFF"
+        NavyBlue = "blue"
+        Purple = "purple"
+        RainbowColor = [Red,Orange,Yellow,Green,LightBlue,NavyBlue,Purple];
+    
 
-        for (q = 1; q <= groupNum; q++) {
-            talk_show_getID = document.getElementById("talk_con_id");
-            talk_show_createHTML = document.createElement("div");
-            talk_show_createHTML.className = "talk_show";
-            talk_show_createHTML.id = "talk_show_id" + q;
-            Form = document.querySelector(".talk_form_id");
-            talk_show_getID.insertBefore(talk_show_createHTML, Form);
+//Start create group button    
+        for(r=1; r<= roomMessage.length; r++){
+            GroupButtonGetID = document.getElementById("GroupButton");
+            GroupButton = document.createElement("div");
+            MainIconForGroup = document.createElement("button");
+            StraightLine = document.createElement("div");
+            GroupButton.className = "GroupIconBackGround";
+            GroupButton.id = "GroupIconBackGround" + r;
+            GroupButton.style.backgroundColor = RainbowColor[getRandom(0,6)];
+            MainIconForGroup.className = "MainIconForGroup";
+            MainIconForGroup.id = "MainIconForGroup" + r;
+            StraightLine.className = "StraightLineForGroup";
+            StraightLine.id = "StraightLineForGroup" + r;
+            GroupButtonGetID.appendChild(GroupButton);
+            GroupButtonGetID.appendChild(MainIconForGroup);
+            GroupButtonGetID.appendChild(StraightLine);
 
-            talk_getID = document.getElementById("talk_show_id" + q);
-            talk_createHTML = document.createElement("div");
-            talk_createHTML.className = "talk";
-            talk_createHTML.id = "talk_id" + q;
-            talk_getID.appendChild(talk_createHTML);
-
-            talk_span_getID = document.getElementById("talk_id" + q);
-            talk_span_createHTML = document.createElement("span");
-            talk_span_createHTML.id = "say";
-            talk_span_createHTML.innerHTML = "這是第" + q + "個群組"
-            talk_span_getID.appendChild(talk_span_createHTML);
+            MainIconForGroupGetID = document.getElementById("MainIconForGroup" + r);
+            DialogBoxContentForGroup = document.createElement("div");
+            DialogBoxContentForGroup.className = "DialogBoxContentForGroup";
+            DialogBoxContentForGroup.id = "DialogBoxContentForGroup" + r;
+            DialogBoxContentForGroup.innerHTML = roomMessage[r - 1].RoomName;
+            MainIconForGroupGetID.appendChild(DialogBoxContentForGroup);
+        }    
+    
+//Start create GroupName
+        var GroupName,MenuGetID;
+        for(r=1; r<= roomMessage.length; r++){
+            MenuGetID = document.getElementById("menu");
+            GroupName = document.createElement("div");
+            GroupName.className = "GroupName";
+            GroupName.innerHTML = roomMessage[r - 1].RoomName;
+            MenuGetID.appendChild(GroupName);
         }
 
-        for (r = 1; r <= groupNum; r++) {
-            button = document.body.appendChild(document.createElement("button"));
-            button.id = "button" + r;
-            button.setAttribute("type", "button");
-            button.setAttribute("index", (r - 1));
-            button.innerHTML = roomMessage[r - 1].RoomName;
+//Start create ChatScreen
+        var Talk,ChatScreenGetID;
+        for(r=1; r<= roomMessage.length; r++){
+            
+            ChatScreenGetID = document.getElementById("ChatScreen");
+            Talk = document.createElement("div");
+            Talk.className = "Talk";
+            Talk.id = "Talk";
+            ChatScreenGetID.appendChild(Talk);
         }
 
-        var button_fun = document.getElementsByTagName("button");
-        var talk_show_fun = document.getElementsByClassName("talk_show");
-        var TalkWords = document.getElementById("talkwords");
-        var TalkSub = document.getElementById("talksub");
-        var str = "";
-        var i, j, x;
-        for (i = 0; i < button_fun.length; i++) {
-            button_fun[i].index = i;
-            button_fun[i].onclick = function () {
-
-
-                for (j = 0; j < button_fun.length; j++) {
-                    button_fun[j].className = ''
+        var MainIconForGroup_tab = document.getElementsByTagName("button");
+        var GroupName_tab = document.getElementsByClassName("GroupName");
+        var DialogBoxContentForGroup_tab = document.getElementsByClassName("DialogBoxContentForGroup");
+        var StraightLine_tab = document.getElementsByClassName("StraightLineForGroup");
+        var GroupButton_tab = document.getElementsByClassName("GroupIconBackGround");
+        var Talk_tab = document.getElementsByClassName("Talk");
+        var TalkWord = document.getElementById("TalkWord");
+        var TalkSub = document.getElementById("TalkSub");
+        var x, str = "";
+        for (r = 0; r < MainIconForGroup_tab.length; r++) {
+            MainIconForGroup_tab[r].index = r;
+            MainIconForGroup_tab[r].onclick = function () {
+                for (r = 0; r < GroupName_tab.length; r++) {
+                    GroupName_tab[r].style.display = "none";
+                    StraightLine_tab[r].style.display = "none";
+                    Talk_tab[r].style.display = "none";
                 }
-                for (i = 0; i < talk_show_fun.length; i++) {
-                    talk_show_fun[i].style.display = 'none';
-                }
-                button_fun[this.index].className = "active";
-                talk_show_fun[this.index].style.display = 'block';
-                x = button_fun[this.index].index;
+                GroupName_tab[this.index].style.display = "block";
+                StraightLine_tab[this.index].style.display = "block";
+                Talk_tab[this.index].style.display = "block";
+                TalkWord.style.display = "block";
+                $("#CreateFriendPage").css("display","none");
+                $("#CreateFriend").css("opacity","1.0");
+                x = MainIconForGroup_tab[this.index].index;
+
+                //Mousedown event for CreateFriendPage
+                $("#CreateFriend").mousedown(function(){
+                    $("#CreateFriend").css("opacity","0.5");
+                    $("#CreateFriendPage").css("display","block");
+                    Talk_tab[x].style.display = "none";
+                    TalkWord.style.display = "none";
+                    StraightLine_tab[x].style.display = "none";
+                })
 
 
                 var xhr_oldMessage = new XMLHttpRequest()
-                xhr_oldMessage.open("GET", "file/oldMessage/" + button_fun[x].innerHTML)
+                xhr_oldMessage.open("GET", "file/oldMessage/" + DialogBoxContentForGroup_tab[x].innerHTML)
                 xhr_oldMessage.onload = function () {
 
-                    
                     var onLoadMessage = JSON.parse(xhr_oldMessage.responseText)
-                    talk_show_fun[x].innerHTML = ''
+                    Talk_tab[x].innerHTML = ''
                     for (var message_num = 0; message_num < onLoadMessage.data.length; message_num++) {
 
-                        talk_show_fun[x].innerHTML += '<div class="talk"><span>' +
+                        Talk_tab[x].innerHTML += '<span>' +
                             onLoadMessage.data[message_num].UserAccount +
                             ': ' +
                             onLoadMessage.data[message_num].Message +
-                            '</span></div>';
-
+                            '<br></span>';
                     }
-
                 };
                 xhr_oldMessage.send();
+            }
 
+            MainIconForGroup_tab[r].onmouseover = function () {
+                for (r = 0; r < DialogBoxContentForGroup_tab.length; r++) {
+                    DialogBoxContentForGroup_tab[r].style.display = "none";
+                }
+                DialogBoxContentForGroup_tab[this.index].style.display = "block";
+            }
+            MainIconForGroup_tab[r].onmouseout = function () {
+                DialogBoxContentForGroup_tab[this.index].style.display = "none";
+            }
 
-                TalkSub.onclick = function () {
-                    if (TalkWords.value == "") {
-                        alert("訊息不能為空");
+            var flag=false;
+            TalkWord.addEventListener("keyup", function (event) {
+                if(flag){
+		            return;
+                }
+                flag = true;
+                
+                if(TalkWord.value == ""){
+                        alert("訊息不能為空!")
                         return;
                     }
+                else if (event.keyCode === 13) {
+
+                    event.preventDefault();
+                    
                     webSocketList["messageName"] = "message"
 
                     var messagePackage = {}
-                    messagePackage["message"] = TalkWords.value
-                    messagePackage["roomName"] = button_fun[x].innerHTML
-
+                    messagePackage["message"] = TalkWord.value
+                    messagePackage["roomName"] = DialogBoxContentForGroup_tab[x].innerHTML
                     webSocketList["data"] = messagePackage
                     ws.send(JSON.stringify(webSocketList))
+                    TalkWord.value = ""
                 }
-
-
-            }
+            });
+            document.addEventListener('keyup',function(){
+	            flag=false;
+            })
         }
     }
 
@@ -294,6 +322,56 @@
                 break;
         }
     }
+
+    $(document).ready(function(){
+    //Mouseover event for MainIcon
+        $("div.MainIcon").mouseover(function(){
+            $("div.MainIconBackGround").css("background-color","rgb(141,121,245)");
+            $("div.MainIconBackGround").css("border-radius","20px")
+            $("div.DialogBoxContent").fadeIn("slow");
+            $("div.StraightLine").fadeIn("slow");
+        });
+        $("div.MainIcon").mouseout(function(){
+            $("div.MainIconBackGround").css("background-color","white");
+            $("div.MainIconBackGround").css("border-radius","30px")
+            $("div.DialogBoxContent").css("display","none");
+            $("div.StraightLine").css("display","none");
+        });
+    //Mouseover event for Friend    
+        $("#Friend").mouseover(function(){
+            $("#Friend").css("background-color","rgb(120,120,120)");
+            $("#Friend").css("color","white");
+        });
+        $("#Friend").mouseout(function(){
+            $("#Friend").css("background-color","transparent");
+            $("#Friend").css("color","rgb(211,211,211)");
+        })
+    //Mouseover event for SubInviteFriend    
+        $("#SubInviteFriend").mouseover(function(){
+            $("#SubInviteFriend").css("background-color","rgb(73, 41, 235)");
+        });
+        $("#SubInviteFriend").mouseout(function(){
+            $("#SubInviteFriend").css("background-color","rgb(92, 64, 233)");
+        })
+    //Mousedown event for CreateFriendPage
+        $("#CreateFriend").mousedown(function(){
+            $("#CreateFriend").css("opacity","0.5");
+            $("#CreateFriendPage").css("display","block");
+        })
+    //Mouseover event for CreateGroupIcon
+        $("#CreateGroupIcon").mouseover(function(){
+            $("#CreateGroupIconBackGround").css("background-color","rgb(141,121,245)");
+            $("#CreateGroupIconBackGround").css("border-radius","20px")
+            $("#StraightLineForCreateGroup").fadeIn("slow");
+            $("#DialogBoxContentForCreateGroup").fadeIn("slow");
+        })
+        $("#CreateGroupIcon").mouseout(function(){
+            $("#CreateGroupIconBackGround").css("background-color","white");
+            $("#CreateGroupIconBackGround").css("border-radius","30px")
+            $("#StraightLineForCreateGroup").css("display","none");
+            $("#DialogBoxContentForCreateGroup").css("display","none");
+        })
+    });
 </script>
 
 </html>
