@@ -37,6 +37,13 @@
         <div class="ChatScreen" id="ChatScreen">
             <input type="text"  value="請輸入訊息..." class="InputText" id="TalkWord" onfocus="this.value=''">
             <input type="button" value="" class="TalkSub" id="TalkSub">
+            <div class="FriendPage" id="FriendPage">
+                <div class="FriendRightClick" id="FriendRightClick">
+                    <div class="FriendRightClickItem" id="FriendRightClickItem">&nbsp;&nbsp;&nbsp;傳送訊息</div>
+                    <div class="FriendRightClickItem" id="FriendRightClickItem">&nbsp;&nbsp;&nbsp;邀請至群組&nbsp;&nbsp;&nbsp;&nbsp;></div>
+                    <div class="FriendRightClickItem" id="FriendRightClickItem">&nbsp;&nbsp;&nbsp;刪除好友</div>
+                </div>
+            </div>
             <div class="CreateFriendPage" id="CreateFriendPage">
                 <h4>新增好友</h4>
                 <h5>&nbsp;&nbsp;&nbsp;&nbsp;您可以在這裡透過輸入好友信箱加入好友列表！</h5>
@@ -45,6 +52,7 @@
                 <div class="HorizontalLine"></div>
             </div>
         </div>
+        <div class="InviteMessagePage" id="InviteMessagePage"></div>
     </div>
 </body>
 <script type='text/javascript'>
@@ -69,7 +77,7 @@
         var onLoadMessage = JSON.parse(xhr_room.responseText)
         console.log(onLoadMessage)
         createRoom(onLoadMessage.data)
-
+        CreateGroupList(onLoadMessage.data)
     };
 
     xhr_friend.open("GET", "file/friend");
@@ -78,25 +86,332 @@
 
         var onLoadMessage = JSON.parse(xhr_friend.responseText)
         console.log(onLoadMessage)
+        var r,FriendPageGetID = document.getElementById("FriendPage")
+        var FriendRightClickGetID = document.getElementById("FriendRightClick")
 
+        for(r=0; r < onLoadMessage.data.length; r++){
+            var CreateFriendDiv = document.createElement("div")
+            CreateFriendDiv.innerHTML = "<span>" + onLoadMessage.data[r].UserAccount + "</span>"
+            CreateFriendDiv.className = "FriendMember"
+            CreateFriendDiv.id = "Friend" + (r+1)
+            FriendPageGetID.insertBefore(CreateFriendDiv,FriendRightClickGetID)
+        }
+
+        var FriendGetClass = document.getElementsByClassName("FriendMember")
+        for(r=0; r < FriendGetClass.length; r++){
+            FriendGetClass[r].index = r;
+
+            FriendGetClass[r].onmouseover = function(){
+                FriendGetClass[this.index].style.backgroundColor = "rgba(141, 141, 141, 0.322)"
+                
+                FriendGetClass[this.index].addEventListener('contextmenu', function(e) {
+	                _x = e.pageX || e.clientX + scrollX;
+	                _y = e.pageY || e.clientY + scrollY;
+	                document.getElementById("FriendRightClick").style.left = (_x-300) + "px";
+	                document.getElementById("FriendRightClick").style.top = (_y-100) + "px";
+                    document.getElementById("FriendRightClick").style.display = "block";
+	                e.preventDefault();
+                }, false);
+                window.onclick = function(){
+                    document.getElementById("FriendRightClick").style.display = "none";
+                }
+            }
+            FriendGetClass[r].onmouseout = function(){
+                FriendGetClass[this.index].style.backgroundColor = "transparent"
+            }
+        }
+
+        function CreateGroupList(roomMessage){
+            var q,FriendRightClickItemGetClass = document.getElementsByClassName("FriendRightClickItem")
+
+            for(q=0; q < roomMessage.length; q++){
+                var GroupList = document.createElement("div");
+                GroupList.className = ""
+            }
+        }
+        
     };
-
+    
     xhr_friendInvite.open("GET", "file/friendInvite");
-
     xhr_friendInvite.onload = function () {
 
-        var onLoadMessage = JSON.parse(xhr_friendInvite.responseText)
-        console.log(onLoadMessage)
+        var FriendInviteMessage = JSON.parse(xhr_friendInvite.responseText)
+        console.log(FriendInviteMessage)
+        var r,InviteMessagePageGetID,InviteMessage,InviteMessageGetID,ConfirmButton,RefuseButton;
 
+        for(r=0; r < FriendInviteMessage.data.length; r++){
+            InviteMessagePageGetID = document.getElementById("InviteMessagePage");
+            InviteMessage = document.createElement("div");
+            InviteMessage.className = "InviteMessage";
+            InviteMessage.id = "InviteMessage";
+            InviteMessagePageGetID.appendChild(InviteMessage);
+        }
+
+        InviteMessageGetID = document.getElementsByClassName("InviteMessage");
+        for(r=0; r < InviteMessageGetID.length; r++){
+            InviteMessageGetID[r].innerHTML = "<h3>&nbsp;&nbsp;" + FriendInviteMessage.data[r].UserAccount +"</h3>" + "<h4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;對您送出好友申請!!!</h4>"
+
+            ConfirmButton = document.createElement("input");
+            ConfirmButton.type = "button";
+            ConfirmButton.className = "Confirm";
+            ConfirmButton.id = "Confirm";
+            ConfirmButton.value = "接受";
+            RefuseButton = document.createElement("input");
+            RefuseButton.type = "button";
+            RefuseButton.className = "Refuse";
+            RefuseButton.id = "Refuse";
+            RefuseButton.value = "拒絕";
+            InviteMessageGetID[r].appendChild(ConfirmButton);
+            InviteMessageGetID[r].appendChild(RefuseButton);
+        }
+        
+        
+        function OnlyOneForFriend(){
+            var ConfirmGetID = document.getElementById("Confirm");
+            var RefuseGetID = document.getElementById("Refuse");
+            var InviteMessageGetID = document.getElementById("InviteMessage");
+            var InviteMessagePageGetID = document.getElementById("InviteMessagePage");
+
+            ConfirmGetID.onmouseover = function(){
+                ConfirmGetID.style.color = "green"
+                ConfirmGetID.style.backgroundColor = "white"
+                ConfirmGetID.style.opacity = "0.5"
+            }
+            ConfirmGetID.onmouseout = function(){
+                ConfirmGetID.style.color = "white"
+                ConfirmGetID.style.backgroundColor = "transparent"
+                ConfirmGetID.style.opacity = "1.0"
+            }
+            ConfirmGetID.onclick = function(){
+                InviteMessagePageGetID.removeChild(InviteMessageGetID)
+            }
+            RefuseGetID.onmouseover = function(){
+                RefuseGetID.style.color = "red"
+                RefuseGetID.style.backgroundColor = "white"
+                RefuseGetID.style.opacity = "0.5"
+            }
+            RefuseGetID.onmouseout = function(){
+                RefuseGetID.style.color = "white"
+                RefuseGetID.style.backgroundColor = "transparent"
+                RefuseGetID.style.opacity = "1.0"
+            }
+            RefuseGetID.onclick = function(){
+                InviteMessagePageGetID.removeChild(InviteMessageGetID)
+            }
+        }    
+        
+    
+        var ConfirmGetID = document.getElementsByClassName("Confirm");
+        var RefuseGetID = document.getElementsByClassName("Refuse");
+        InviteMessagePageGetID = document.getElementById("InviteMessagePage");
+
+        
+        for(r=0; r < ConfirmGetID.length; r++){
+            ConfirmGetID[r].index = r;
+            RefuseGetID[r].index = r;
+            ConfirmGetID[r].onmouseover = function(){
+                if(InviteMessageGetID.length > 1){
+                    ConfirmGetID[this.index].style.color = "green"
+                    ConfirmGetID[this.index].style.backgroundColor = "white"
+                    ConfirmGetID[this.index].style.opacity = "0.5"
+                }
+                else{
+                    OnlyOneForFriend()
+                    return;
+                };
+            };
+            ConfirmGetID[r].onmouseout = function(){
+                if(InviteMessageGetID.length > 1){
+                    ConfirmGetID[this.index].style.color = "white"
+                    ConfirmGetID[this.index].style.backgroundColor = "transparent"
+                    ConfirmGetID[this.index].style.opacity = "1.0"
+                }
+                else{
+                    OnlyOneForFriend()
+                    return;
+                };
+            };
+            ConfirmGetID[r].onclick = function(){
+                if(InviteMessageGetID.length > 1){
+                    InviteMessagePageGetID.removeChild(InviteMessageGetID[this.index])
+                }
+                else{
+                    OnlyOneForFriend()
+                    return;
+                };
+            };
+            RefuseGetID[r].onmouseover = function(){
+                if(InviteMessageGetID.length > 1){
+                    RefuseGetID[this.index].style.color = "red"
+                    RefuseGetID[this.index].style.backgroundColor = "white"
+                    RefuseGetID[this.index].style.opacity = "0.5"
+                }
+                else{
+                    OnlyOneForFriend()
+                    return;
+                };
+            };
+            RefuseGetID[r].onmouseout = function(){
+                if(InviteMessageGetID.length > 1){
+                    RefuseGetID[this.index].style.color = "white"
+                    RefuseGetID[this.index].style.backgroundColor = "transparent"
+                    RefuseGetID[this.index].style.opacity = "1.0"
+                }
+                else{
+                    OnlyOneForFriend()
+                    return;
+                };
+            };
+            RefuseGetID[r].onclick = function(){
+                if(InviteMessageGetID.length > 1){
+                    InviteMessagePageGetID.removeChild(InviteMessageGetID[this.index])
+                }
+                else{
+                    OnlyOneForFriend()
+                    return;
+                };
+            };
+        }
     };
 
     xhr_groupInvite.open("GET", "file/groupInvite");
 
     xhr_groupInvite.onload = function () {
 
-        var onLoadMessage = JSON.parse(xhr_groupInvite.responseText)
-        console.log(onLoadMessage)
+        var GroupInviteMessage = JSON.parse(xhr_groupInvite.responseText)
+        console.log(GroupInviteMessage)
+        var x,GroupInviteMessagePageGetID,GroupInviteMessageDiv,InviteMessageGroupGetID,GroupConfirmButton,GroupRefuseButton;
 
+        for(x=0; x < GroupInviteMessage.data.length; x++){
+            GroupInviteMessagePageGetID = document.getElementById("InviteMessagePage");
+            GroupInviteMessageDiv = document.createElement("div");
+            GroupInviteMessageDiv.className = "GroupInviteMessage";
+            GroupInviteMessageDiv.id = "GroupInviteMessage";
+            GroupInviteMessagePageGetID.appendChild(GroupInviteMessageDiv);
+        }
+
+        InviteMessageGroupGetID = document.getElementsByClassName("GroupInviteMessage");
+        for(x=0; x < InviteMessageGroupGetID.length; x++){
+            InviteMessageGroupGetID[x].innerHTML = "<h3>&nbsp;&nbsp;" + GroupInviteMessage.data[x].RoomName +"</h3>" + "<h4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;這個群組對您發出邀請!!!</h4>"
+
+            GroupConfirmButton = document.createElement("input");
+            GroupConfirmButton.type = "button";
+            GroupConfirmButton.className = "GroupConfirm";
+            GroupConfirmButton.id = "GroupConfirm";
+            GroupConfirmButton.value = "接受";
+            GroupRefuseButton = document.createElement("input");
+            GroupRefuseButton.type = "button";
+            GroupRefuseButton.className = "GroupRefuse";
+            GroupRefuseButton.id = "GroupRefuse";
+            GroupRefuseButton.value = "拒絕";
+            InviteMessageGroupGetID[x].appendChild(GroupConfirmButton);
+            InviteMessageGroupGetID[x].appendChild(GroupRefuseButton);
+        }
+    
+        function OnlyOneForGroup(){
+            var GroupConfirmGetID = document.getElementById("GroupConfirm");
+            var GroupRefuseGetID = document.getElementById("GroupRefuse");
+            var InviteMessageGroupGetID = document.getElementById("GroupInviteMessage");
+            var GroupInviteMessagePageGetID = document.getElementById("InviteMessagePage");
+
+            GroupConfirmGetID.onmouseover = function(){
+                GroupConfirmGetID.style.color = "green"
+                GroupConfirmGetID.style.backgroundColor = "white"
+                GroupConfirmGetID.style.opacity = "0.5"
+            }
+            GroupConfirmGetID.onmouseout = function(){
+                GroupConfirmGetID.style.color = "white"
+                GroupConfirmGetID.style.backgroundColor = "transparent"
+                GroupConfirmGetID.style.opacity = "1.0"
+            }
+            GroupConfirmGetID.onclick = function(){
+                GroupInviteMessagePageGetID.removeChild(InviteMessageGroupGetID)   
+            }
+            GroupRefuseGetID.onmouseover = function(){
+                GroupRefuseGetID.style.color = "red"
+                GroupRefuseGetID.style.backgroundColor = "white"
+                GroupRefuseGetID.style.opacity = "0.5"
+            }
+            GroupRefuseGetID.onmouseout = function(){
+                GroupRefuseGetID.style.color = "white"
+                GroupRefuseGetID.style.backgroundColor = "transparent"
+                GroupRefuseGetID.style.opacity = "1.0"
+            }
+            GroupRefuseGetID.onclick = function(){
+                GroupInviteMessagePageGetID.removeChild(InviteMessageGroupGetID)
+            }
+        }    
+        
+        var GroupConfirmGetID = document.getElementsByClassName("GroupConfirm");
+        var GroupRefuseGetID = document.getElementsByClassName("GroupRefuse");
+        GroupInviteMessagePageGetID = document.getElementById("InviteMessagePage");
+       
+        for(x=0; x < GroupConfirmGetID.length; x++){
+            GroupConfirmGetID[x].index = x;
+            GroupRefuseGetID[x].index = x;
+            GroupConfirmGetID[x].onmouseover = function(){
+                if(InviteMessageGroupGetID.length > 1){
+                    GroupConfirmGetID[this.index].style.color = "green"
+                    GroupConfirmGetID[this.index].style.backgroundColor = "white"
+                    GroupConfirmGetID[this.index].style.opacity = "0.5"
+                }
+                else{
+                    OnlyOneForGroup()
+                    return;
+                };
+            };
+            GroupConfirmGetID[x].onmouseout = function(){
+                if(InviteMessageGroupGetID.length > 1){
+                    GroupConfirmGetID[this.index].style.color = "white"
+                    GroupConfirmGetID[this.index].style.backgroundColor = "transparent"
+                    GroupConfirmGetID[this.index].style.opacity = "1.0"
+                }
+                else{
+                    OnlyOneForGroup()
+                    return;
+                };
+            };
+            GroupConfirmGetID[x].onclick = function(){
+                if(InviteMessageGroupGetID.length > 1){
+                    GroupInviteMessagePageGetID.removeChild(InviteMessageGroupGetID[this.index])
+                }
+                else{
+                    OnlyOneForGroup()
+                    return;
+                };   
+            };
+            GroupRefuseGetID[x].onmouseover = function(){
+                if(InviteMessageGroupGetID.length > 1){
+                    GroupRefuseGetID[this.index].style.color = "red"
+                    GroupRefuseGetID[this.index].style.backgroundColor = "white"
+                    GroupRefuseGetID[this.index].style.opacity = "0.5"
+                }
+                else{
+                    OnlyOneForGroup()
+                    return;
+                }; 
+            };
+            GroupRefuseGetID[x].onmouseout = function(){
+                if(InviteMessageGroupGetID.length > 1){
+                    GroupRefuseGetID[this.index].style.color = "white"
+                    GroupRefuseGetID[this.index].style.backgroundColor = "transparent"
+                    GroupRefuseGetID[this.index].style.opacity = "1.0"
+                }
+                else{
+                    OnlyOneForGroup()
+                    return;
+                };
+            };
+            GroupRefuseGetID[x].onclick = function(){
+                if(InviteMessageGroupGetID.length > 1){
+                    GroupInviteMessagePageGetID.removeChild(InviteMessageGroupGetID[this.index])
+                }
+                else{
+                    OnlyOneForGroup()
+                    return;
+                };
+            };
+        }
     };
 
 
@@ -225,6 +540,9 @@
                 TalkWord.style.display = "block";
                 $("#CreateFriendPage").css("display","none");
                 $("#CreateFriend").css("opacity","1.0");
+                $("#Friend").css("background-color","transparent");
+                $("#Friend").css("color","rgb(211,211,211)");
+                $("#FriendPage").css("display","none");
                 x = MainIconForGroup_tab[this.index].index;
 
                 //Mousedown event for CreateFriendPage
@@ -234,6 +552,24 @@
                     Talk_tab[x].style.display = "none";
                     TalkWord.style.display = "none";
                     StraightLine_tab[x].style.display = "none";
+                })
+
+                //Mousedown event for Friend
+                $("#Friend").mousedown(function(){
+                    $("#Friend").css("background-color","rgb(120,120,120)");
+                    $("#Friend").css("color","white");
+                    $("#FriendPage").css("display","block");
+                    Talk_tab[x].style.display = "none";
+                    TalkWord.style.display = "none";
+                    StraightLine_tab[x].style.display = "none";
+                })
+                $("#Friend").mouseover(function(){
+                    $("#Friend").css("background-color","rgb(120,120,120)");
+                    $("#Friend").css("color","white");
+                });
+                $("#Friend").mouseout(function(){
+                    $("#Friend").css("background-color","transparent");
+                    $("#Friend").css("color","rgb(211,211,211)");
                 })
 
 
@@ -337,7 +673,16 @@
             $("div.DialogBoxContent").css("display","none");
             $("div.StraightLine").css("display","none");
         });
-    //Mouseover event for Friend    
+    //Mouse event for Friend
+        $("#Friend").mousedown(function(){
+            $("#Friend").unbind("mouseover");
+            $("#Friend").unbind("mouseout");
+            $("#FriendPage").css("display","block");
+            $("#Friend").css("background-color","rgb(120,120,120)");
+            $("#Friend").css("color","white");
+            $("#CreateFriendPage").css("display","none");
+            $("#CreateFriend").css("opacity","1.0");
+        })    
         $("#Friend").mouseover(function(){
             $("#Friend").css("background-color","rgb(120,120,120)");
             $("#Friend").css("color","white");
@@ -357,6 +702,9 @@
         $("#CreateFriend").mousedown(function(){
             $("#CreateFriend").css("opacity","0.5");
             $("#CreateFriendPage").css("display","block");
+            $("#FriendPage").css("display","none");
+            $("#Friend").css("background-color","transparent");
+            $("#Friend").css("color","rgb(211,211,211)");
         })
     //Mouseover event for CreateGroupIcon
         $("#CreateGroupIcon").mouseover(function(){

@@ -298,6 +298,48 @@
         overflow: scroll;
         overflow-x: hidden;
     }
+    .content .ChatScreen .FriendPage{
+        display: none;
+        height: 830px;
+        width: 1310px;
+        position: absolute;
+        background-color: transparent;
+    }
+    .FriendPage .FriendMember{
+        height: 50px;
+        width: 1300px;
+        line-height: 50px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        font-size: 25px;
+        color: white;
+        background-color: transparent;
+        border-radius: 10px;
+        margin-top: 10px;
+        position: relative;
+        cursor: pointer;
+        z-index: 1;
+    }
+    .FriendPage .FriendRightClick{
+        display: none;
+        height: 120px;
+        width: 120px;
+        background-color: rgba(121, 121, 121, 0.877);
+        border-radius: 10px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        z-index: 2;
+
+    }
+    .FriendRightClick .FriendRightClickItem{
+        height: 40px;
+        width: 120px;
+        line-height: 40px;
+        background-color: transparent;
+        color: white;
+        font-size: 15px;
+        position: relative;
+    }
     .content .ChatScreen .CreateFriendPage{
         display: none;
         height: 770px;
@@ -388,5 +430,86 @@
         position: absolute;
         top: 790px;
         left: 1220px;
+    }
+    .content .InviteMessagePage{
+        height: 830px;
+        width: 245px;
+        position: absolute;
+        top: 95px;
+        right: 5px;
+    }
+    .content .InviteMessagePage .InviteMessage{
+        width: 235px;
+        height: 150px;
+        position: relative;
+        background-color: transparent;
+        border-style: solid;
+        border-width: 5px;
+        border-color: rgb(63, 30, 230);
+        margin-top: 10px;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    .InviteMessage .Confirm{
+        width: 117.5px;
+        height: 30px;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        outline: none;
+        position: absolute;
+        bottom: 0px;
+    }
+    .InviteMessage .Refuse{
+        width: 117.5px;
+        height: 30px;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        outline: none;
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
+    }
+    .content .InviteMessagePage .GroupInviteMessage{
+        width: 235px;
+        height: 150px;
+        position: relative;
+        background-color: transparent;
+        border-style: solid;
+        border-width: 5px;
+        border-color: rgb(63, 30, 230);
+        margin-top: 10px;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    .GroupInviteMessage .GroupConfirm{
+        width: 117.5px;
+        height: 30px;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        outline: none;
+        position: absolute;
+        bottom: 0px;
+    }
+    .GroupInviteMessage .GroupRefuse{
+        width: 117.5px;
+        height: 30px;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        outline: none;
+        position: absolute;
+        bottom: 0px;
+        right: 0px;
     }
 }
